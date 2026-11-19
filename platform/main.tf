@@ -72,5 +72,16 @@ resource "databricks_schema" "tfSchemaGoldFlights" {
 # SECRETS
 
 resource "databricks_secret_scope" "tfSecretScopeOpensky" {
-  name = "OPENSKY"
+  name = "opensky"
+}
+
+
+# VOLUMES
+
+resource "databricks_volume" "tfVolumeBronzeFlightsRaw" {
+  catalog_name = databricks_catalog.tfLayerBronze.name
+  schema_name  = databricks_schema.tfSchemaBronzeFlights.name
+  name         = "raw"
+  volume_type  = "MANAGED"
+  comment      = "@terraform"
 }

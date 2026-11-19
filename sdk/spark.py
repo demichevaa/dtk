@@ -1,6 +1,8 @@
 import os
 from typing import Optional
 
+from .log import FATAL
+
 
 def _default_backend() -> str:
     if os.environ.get("SDK_SPARK_BACKEND"):
@@ -21,7 +23,7 @@ def new_spark(backend: Optional[str] = None, conf: Optional[dict] = None):
             builder = builder.config(k, v)
         return builder.getOrCreate()
 
-    raise ValueError(f"unknown spark backend {backend!r}, expected 'databricks' or 'local'")
+    FATAL("Spark(%s) unknown backend: expected 'databricks' or 'local'", backend)
 
 
 _global = None
@@ -31,7 +33,7 @@ _global_backend: Optional[str] = None
 def SPARK_INIT(backend: str, conf: Optional[dict] = None):
     global _global, _global_backend
     if _global is not None and _global_backend != backend:
-        raise RuntimeError(f"SPARK already in use with backend {_global_backend!r}")
+        FATAL("Spark(%s) already in use, can't switch to %s", _global_backend, backend)
     if _global is None:
         _global, _global_backend = new_spark(backend, conf), backend
     return _global

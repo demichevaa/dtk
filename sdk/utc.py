@@ -5,10 +5,11 @@ from datetime import datetime, timezone
 
 
 def _require_utc(dt: datetime) -> datetime:
+    from .log import FATAL  # lazy: log imports utc
     if not isinstance(dt, datetime):
-        raise TypeError(f"expected datetime, got {type(dt).__name__}")
+        FATAL("Datetime(%r) invalid: expected datetime, got %s", dt, type(dt).__name__)
     if dt.tzinfo is None or dt.utcoffset() is None:
-        raise ValueError(f"naive datetime {dt!r}: zone unknown, use sdk.utc_now() or sdk.utc_from_epoch_s()")
+        FATAL("Datetime(%r) is naive: zone unknown, use sdk.utc_now() or sdk.utc_from_epoch_s()", dt)
     return dt.astimezone(timezone.utc)
 
 
