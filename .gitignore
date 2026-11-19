@@ -1,0 +1,6 @@
+platform/.terraform/
+platform/*.tfstate
+platform/*.tfstate.*
+.env
+object_storage/
+__pycache__/
