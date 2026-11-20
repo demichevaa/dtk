@@ -1,8 +1,8 @@
 import json
 from typing import Optional
 
-import sdk
-from connector import http
+import dtk
+from dtk.connector import http
 
 API_URL = "https://opensky-network.org/api"
 AUTH_URL = "https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token"
@@ -16,7 +16,7 @@ def token(client_id: str, client_secret: str, timeout: int = 10) -> str:
         timeout=timeout,
     )
     body = json.loads(data)
-    sdk.LOG("Token(OpenSky) received, expires in %ss", body.get("expires_in"))
+    dtk.LOG("Token(OpenSky) received, expires in %ss", body.get("expires_in"))
     return body["access_token"]
 
 

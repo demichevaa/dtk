@@ -9,7 +9,7 @@ def _require_utc(dt: datetime) -> datetime:
     if not isinstance(dt, datetime):
         FATAL("Datetime(%r) invalid: expected datetime, got %s", dt, type(dt).__name__)
     if dt.tzinfo is None or dt.utcoffset() is None:
-        FATAL("Datetime(%r) is naive: zone unknown, use sdk.utc_now() or sdk.utc_from_epoch_s()", dt)
+        FATAL("Datetime(%r) is naive: zone unknown, use dtk.utc_now() or dtk.utc_from_epoch_s()", dt)
     return dt.astimezone(timezone.utc)
 
 

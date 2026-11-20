@@ -1,9 +1,8 @@
 import sys
 from datetime import datetime
 
-from connector import http, opensky
-from sdk import FATAL, OBJECT_NAME, SECRET, ObjectStorage, utc_parse, utc_to_epoch_s, write_with_meta
-from sdk.local import make_local_storage
+from dtk.connector import http, opensky
+from dtk import FATAL, SECRET, ObjectStorage, land, landing_key_by_ts, utc_parse, utc_to_epoch_s
 
 
 def states_all(storage: ObjectStorage) -> None:
@@ -17,7 +16,7 @@ def states_all(storage: ObjectStorage) -> None:
         headers=opensky.headers(token),
         ok=(200,),
     )
-    write_with_meta(storage, OBJECT_NAME("opensky/states_all", meta["fetched_at_utc"]), data, meta)
+    land(storage, landing_key_by_ts("opensky/states_all", meta["fetched_at_utc"]), data, meta)
 
 
 def flights_all(storage: ObjectStorage, begin_utc: datetime, end_utc: datetime) -> None:
@@ -32,7 +31,7 @@ def flights_all(storage: ObjectStorage, begin_utc: datetime, end_utc: datetime) 
         headers=opensky.headers(token),
         ok=(200,),
     )
-    write_with_meta(storage, OBJECT_NAME("opensky/flights_all", meta["fetched_at_utc"]), data, meta)
+    land(storage, landing_key_by_ts("opensky/flights_all", meta["fetched_at_utc"]), data, meta)
 
 
 def flights_arrival(storage: ObjectStorage, airport_icao: str, begin_utc: datetime, end_utc: datetime) -> None:
@@ -47,13 +46,17 @@ def flights_arrival(storage: ObjectStorage, airport_icao: str, begin_utc: dateti
         headers=opensky.headers(token),
         ok=(200,),
     )
-    write_with_meta(storage, OBJECT_NAME(f"opensky/flights_arrival/{airport_icao}", meta["fetched_at_utc"]), data, meta)
+    
+    land(storage, landing_key_by_ts(f"opensky/flights_arrival/{airport_icao}", meta["fetched_at_utc"]), data, meta)
 
 
 if __name__ == "__main__":
     # opensky_ingest.py                                       -> states_all
     # opensky_ingest.py flights_all BEGIN END                 -> BEGIN/END ISO 8601 UTC, e.g. 2026-11-18T00:00:00Z
     # opensky_ingest.py flights_arrival AIRPORT BEGIN END     -> AIRPORT ICAO, e.g. EDDF
-    storage = make_local_storage("./object_storage")
+    from dtk import make_secret_envar, make_storage_local
+
+    make_secret_envar()
+    storage = make_storage_local("./object_storage")
 
     states_all(storage)
